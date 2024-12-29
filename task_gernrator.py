@@ -345,6 +345,187 @@ def get_code_history() -> List[Dict[str, Any]]:
     return [{'task': row[0], 'code': row[1], 'timestamp': row[2]} for row in rows]
 
 
+# Task 7: Blog Generator
+def handle_blog_generation(keywords: str) -> str:
+    prompt = f"""Generate a well-structured, engaging blog post (400-500 words) based on these keywords: {keywords}
+    Include:
+    - An attention-grabbing title
+    - Clear introduction
+    - Main points with examples
+    - Conclusion"""
+
+    blog_content = get_chatgpt_response(prompt)
+
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO blog_posts (keywords, content, timestamp) VALUES (?, ?, ?)",
+        (keywords, blog_content, datetime_to_str(datetime.now()))
+    )
+    conn.commit()
+    conn.close()
+
+    return blog_content
+
+
+def get_blog_history() -> List[Dict[str, Any]]:
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT keywords, content, timestamp FROM blog_posts ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{'keywords': row[0], 'content': row[1], 'timestamp': row[2]} for row in rows]
+
+
+# Task 8: Quiz Generator
+def handle_quiz_generation(topic: str) -> str:
+    prompt = f"""Generate 5 quiz questions about: {topic}
+    For each question include:
+    - The question
+    - Multiple choice options (A, B, C, D)
+    - The correct answer
+    - A brief explanation"""
+
+    quiz = get_chatgpt_response(prompt)
+
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO quizzes (topic, questions_answers, timestamp) VALUES (?, ?, ?)",
+        (topic, quiz, datetime_to_str(datetime.now()))
+    )
+    conn.commit()
+    conn.close()
+
+    return quiz
+
+
+def get_quiz_history() -> List[Dict[str, Any]]:
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT topic, questions_answers, timestamp FROM quizzes ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{'topic': row[0], 'quiz': row[1], 'timestamp': row[2]} for row in rows]
+
+
+# Task 9: Sentiment Analysis
+def handle_sentiment_analysis(text: str) -> str:
+    prompt = f"""Analyze the sentiment of this text and provide:
+    1. Overall classification (Positive/Negative/Neutral)
+    2. Confidence level
+    3. Key emotional indicators
+    4. Brief explanation of the analysis
+
+    Text: {text}"""
+
+    analysis = get_chatgpt_response(prompt)
+
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO sentiment_analysis (text, sentiment, timestamp) VALUES (?, ?, ?)",
+        (text, analysis, datetime_to_str(datetime.now()))
+    )
+    conn.commit()
+    conn.close()
+
+    return analysis
+
+
+def get_sentiment_history() -> List[Dict[str, Any]]:
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT text, sentiment, timestamp FROM sentiment_analysis ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{'text': row[0], 'sentiment': row[1], 'timestamp': row[2]} for row in rows]
+
+
+# Task 10: Product Review Summarizer
+def handle_review_summarization(reviews: str) -> str:
+    prompt = f"""Analyze and summarize these product reviews with:
+    1. Overall sentiment and rating trend
+    2. Key positive points
+    3. Key negative points
+    4. Common user experiences
+    5. Notable recommendations
+
+    Reviews:
+    {reviews}"""
+
+    summary = get_chatgpt_response(prompt)
+
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO product_reviews (reviews, summary, timestamp) VALUES (?, ?, ?)",
+        (reviews, summary, datetime_to_str(datetime.now()))
+    )
+    conn.commit()
+    conn.close()
+
+    return summary
+
+
+def get_review_summary_history() -> List[Dict[str, Any]]:
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT reviews, summary, timestamp FROM product_reviews ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{'reviews': row[0], 'summary': row[1], 'timestamp': row[2]} for row in rows]
+
+
+# Task 11: Course Chapter Generator
+def handle_chapter_generation(description: str, subject: str, level: str) -> str:
+    prompt = f"""Create a detailed course outline with the following:
+    1. Course Overview
+    2. Learning Objectives
+    3. Detailed chapter breakdown with subsections
+    4. Estimated time per chapter
+    5. Recommended prerequisites
+
+    Details:
+    Description: {description}
+    Subject: {subject}
+    Level: {level}"""
+
+    contents = get_chatgpt_response(prompt)
+
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO course_chapters (description, subject, level, contents, timestamp) VALUES (?, ?, ?, ?, ?)",
+        (description, subject, level, contents, datetime_to_str(datetime.now()))
+    )
+    conn.commit()
+    conn.close()
+
+    return contents
+
+
+def get_course_history() -> List[Dict[str, Any]]:
+    conn = sqlite3.connect('database/ai_tasks.db')
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT description, subject, level, contents, timestamp 
+        FROM course_chapters 
+        ORDER BY timestamp DESC
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    return [{
+        'description': row[0],
+        'subject': row[1],
+        'level': row[2],
+        'contents': row[3],
+        'timestamp': row[4]
+    } for row in rows]
+
+
+
+
 def main():
     # Create database directory if it doesn't exist
     os.makedirs('database', exist_ok=True)
@@ -482,6 +663,245 @@ def main():
                             print("-" * 50)
                 else:
                     print("Search keyword cannot be empty.")
+
+        if choice == "5":
+            print("\nEmail Reply Generator")
+            print("1. Generate new email reply")
+            print("2. View email history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                print("\nEnter the email you want to reply to (press Enter twice to finish):")
+                lines = []
+                while True:
+                    line = input()
+                    if line == "":
+                        break
+                    lines.append(line)
+                email = "\n".join(lines)
+
+                if email:
+                    print("\nGenerating reply...")
+                    reply = handle_email_reply(email)
+                    print("\nGenerated Reply:")
+                    print(reply)
+                else:
+                    print("Email content cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_email_history()
+                if not history:
+                    print("\nNo email replies found in history.")
+                else:
+                    print("\nEmail Reply History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nEntry {i} - {entry['timestamp']}")
+                        print("\nOriginal Email:")
+                        print(entry['original_email'])
+                        print("\nGenerated Reply:")
+                        print(entry['reply'])
+                        print("-" * 50)
+
+        if choice == "6":
+            print("\nCode Snippet Generator")
+            print("1. Generate new code snippet")
+            print("2. View code history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                task = input("Enter the programming task or question:\n")
+                if task:
+                    print("\nGenerating code...")
+                    code = handle_code_generation(task)
+                    print("\nGenerated Code Solution:")
+                    print(code)
+                else:
+                    print("Task description cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_code_history()
+                if not history:
+                    print("\nNo code snippets found in history.")
+                else:
+                    print("\nCode Snippet History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nEntry {i} - {entry['timestamp']}")
+                        print("Task:")
+                        print(entry['task'])
+                        print("\nCode Solution:")
+                        print(entry['code'])
+                        print("-" * 50)
+
+        if choice == "7":
+            print("\nBlog Generator")
+            print("1. Generate new blog post")
+            print("2. View blog history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                keywords = input("Enter keywords or topics for the blog post: ")
+                if keywords:
+                    print("\nGenerating blog post...")
+                    blog = handle_blog_generation(keywords)
+                    print("\nGenerated Blog Post:")
+                    print(blog)
+                else:
+                    print("Keywords cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_blog_history()
+                if not history:
+                    print("\nNo blog posts found in history.")
+                else:
+                    print("\nBlog History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nBlog {i} - {entry['timestamp']}")
+                        print(f"Keywords: {entry['keywords']}")
+                        print("\nContent:")
+                        print(entry['content'])
+                        print("-" * 50)
+
+        if choice == "8":
+            print("\nQuiz Generator")
+            print("1. Generate new quiz")
+            print("2. View quiz history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                topic = input("Enter the topic for quiz generation: ")
+                if topic:
+                    print("\nGenerating quiz...")
+                    quiz = handle_quiz_generation(topic)
+                    print("\nGenerated Quiz:")
+                    print(quiz)
+                else:
+                    print("Topic cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_quiz_history()
+                if not history:
+                    print("\nNo quizzes found in history.")
+                else:
+                    print("\nQuiz History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nQuiz {i} - {entry['timestamp']}")
+                        print(f"Topic: {entry['topic']}")
+                        print("\nQuestions and Answers:")
+                        print(entry['quiz'])
+                        print("-" * 50)
+
+        if choice == "9":
+            print("\nSentiment Analysis")
+            print("1. Analyze new text")
+            print("2. View analysis history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                print("\nEnter the text for sentiment analysis (press Enter twice to finish):")
+                lines = []
+                while True:
+                    line = input()
+                    if line == "":
+                        break
+                    lines.append(line)
+                text = "\n".join(lines)
+
+                if text:
+                    print("\nAnalyzing sentiment...")
+                    analysis = handle_sentiment_analysis(text)
+                    print("\nSentiment Analysis:")
+                    print(analysis)
+                else:
+                    print("Text cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_sentiment_history()
+                if not history:
+                    print("\nNo analyses found in history.")
+                else:
+                    print("\nAnalysis History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nAnalysis {i} - {entry['timestamp']}")
+                        print("Original Text:")
+                        print(entry['text'])
+                        print("\nSentiment Analysis:")
+                        print(entry['sentiment'])
+                        print("-" * 50)
+
+        if choice == "10":
+            print("\nProduct Review Summarizer")
+            print("1. Summarize new reviews")
+            print("2. View summary history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                print("\nEnter the product reviews (press Enter twice to finish):")
+                lines = []
+                while True:
+                    line = input()
+                    if line == "":
+                        break
+                    lines.append(line)
+                reviews = "\n".join(lines)
+
+                if reviews:
+                    print("\nGenerating summary...")
+                    summary = handle_review_summarization(reviews)
+                    print("\nReview Summary:")
+                    print(summary)
+                else:
+                    print("Reviews cannot be empty.")
+
+            elif subchoice == "2":
+                history = get_review_summary_history()
+                if not history:
+                    print("\nNo review summaries found in history.")
+                else:
+                    print("\nReview Summary History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nSummary {i} - {entry['timestamp']}")
+                        print("Original Reviews:")
+                        print(entry['reviews'])
+                        print("\nGenerated Summary:")
+                        print(entry['summary'])
+                        print("-" * 50)
+
+        if choice == "11":
+            print("\nCourse Chapter Generator")
+            print("1. Generate new course outline")
+            print("2. View course history")
+            subchoice = input("Enter your choice (1-2): ")
+
+            if subchoice == "1":
+                description = input("Enter course description: ")
+                subject = input("Enter course subject: ")
+                level = input("Enter course level (Beginner/Intermediate/Advanced): ")
+
+                if description and subject and level:
+                    print("\nGenerating course outline...")
+                    contents = handle_chapter_generation(description, subject, level)
+                    print("\nGenerated Course Outline:")
+                    print(contents)
+                else:
+                    print("All fields are required.")
+
+            elif subchoice == "2":
+                history = get_course_history()
+                if not history:
+                    print("\nNo course outlines found in history.")
+                else:
+                    print("\nCourse History:")
+                    for i, entry in enumerate(history, 1):
+                        print(f"\nCourse {i} - {entry['timestamp']}")
+                        print(f"Subject: {entry['subject']}")
+                        print(f"Level: {entry['level']}")
+                        print("\nDescription:")
+                        print(entry['description'])
+                        print("\nCourse Outline:")
+                        print(entry['contents'])
+                        print("-" * 50)
+
+
 
 
 
