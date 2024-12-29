@@ -60,7 +60,7 @@ A versatile Python application that leverages OpenAI's GPT models to perform var
 #### Clone the Repository
 ```bash
 git clone https://github.com/yourusername/ai-task-assistant.git
-cd ai-task-assistant
+cd ai_assignments
 ```
 
 #### Create Virtual Environment
