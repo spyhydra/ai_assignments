@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 
 
 # Replace with your OpenAI API key
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 # Function to convert datetime to string for SQLite
 def datetime_to_str(dt):
