@@ -3,11 +3,10 @@ from openai import OpenAI
 from datetime import datetime
 import os
 from typing import List, Dict, Any
-import json
+
 
 # Replace with your OpenAI API key
 client = OpenAI(api_key="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")
-
 
 # Function to convert datetime to string for SQLite
 def datetime_to_str(dt):
