@@ -87,7 +87,7 @@ client = OpenAI(api_key="your-api-key-here")
 
 #### Initialize Database
 ```bash
-python main.py
+python app.py
 ```
 
 ## Usage 💡
